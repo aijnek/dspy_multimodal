@@ -1,5 +1,6 @@
 # Setup
 import dspy
+from dspy.evaluate import Evaluate
 from PIL import Image
 from create_dataset import create_count_dataset, split_dataset
 
@@ -58,33 +59,21 @@ def evaluate_dataset():
     # プログラムの定義
     program = dspy.Predict("image: dspy.Image -> number_of_people: int")
 
-    # 開発セットで評価
+    # Evaluateユーティリティを使用して開発セットで評価
     print("\n開発セットで評価中...")
     print("-" * 60)
 
-    correct = 0
-    total = len(devset)
+    evaluator = Evaluate(
+        devset=devset,
+        num_threads=1,
+        display_progress=True,
+        display_table=5
+    )
 
-    for i, example in enumerate(devset, 1):
-        # 予測
-        pred = program(**example.inputs())
+    result = evaluator(program, metric=count_exact_match)
 
-        # count_exact_matchを使用して評価
-        # メトリクスは example と pred を比較
-        is_correct = count_exact_match(example, pred)
-
-        if is_correct:
-            correct += 1
-            status = "✓"
-        else:
-            status = "✗"
-
-        print(f"{status} [{i}/{total}] 正解: {example.number_of_people}, 予測: {pred.number_of_people}")
-
-    accuracy = correct / total if total > 0 else 0
     print("-" * 60)
-    print(f"\n正解数: {correct}/{total}")
-    print(f"精度: {accuracy:.2%}")
+    print(f"\n精度: {float(result):.1f}%")
     print()
 
 if __name__ == "__main__":
