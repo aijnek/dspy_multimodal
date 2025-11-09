@@ -36,7 +36,7 @@ def create_count_dataset():
                 try:
                     # 画像を読み込んでサムネイル化
                     img = Image.open(image_path)
-                    img.thumbnail((1024, 1024), Image.LANCZOS)
+                    img.thumbnail((512, 512), Image.LANCZOS)
 
                     # dspy.Exampleを作成
                     example = dspy.Example(
@@ -52,7 +52,7 @@ def create_count_dataset():
 
     return dataset
 
-def split_dataset(dataset, train_ratio=0.7, dev_ratio=0.15, test_ratio=0.15):
+def split_dataset(dataset, train_ratio=0.6, dev_ratio=0.2):
     """
     データセットを訓練/開発/テストセットに分割
 

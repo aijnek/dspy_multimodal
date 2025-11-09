@@ -1,0 +1,32 @@
+{
+  "predict": {
+    "traces": [],
+    "train": [],
+    "demos": [],
+    "signature": {
+      "instructions": "You are tasked with counting the number of people visible in an image.\n\n## Task Description\nGiven an image, you must count all visible people in the image and provide:\n1. A `reasoning` field that explains your counting process\n2. A `number_of_people` field with the final count\n\n## Important Counting Rules\n- Count all visible people, including both adults and children\n- Count partial people (e.g., people partially visible at image edges) as long as they are identifiable as people\n- Be thorough and systematic in your counting to avoid missing anyone\n- If the number of people is 10 or greater, report the answer as 10 (do not count beyond 10)\n- Double-check your count by going through the image methodically (e.g., left to right, top to bottom)\n\n## Critical Accuracy Notes\n- ONLY count actual people visible in the image. Do not count:\n  - Drawings, paintings, or artistic representations of people\n  - Statues or sculptures\n  - Dolls or toys\n  - Shadows or silhouettes that are not clearly identifiable as people\n  - Reflections of people\n  - Empty playgrounds or backgrounds with no people present\n- If you see what appears to be a playground or outdoor scene with no actual people in it, the count is 0\n- Be very careful to distinguish between actual human figures and other objects that might resemble people\n\n## Reasoning Guidelines\n- Explain your counting methodology clearly\n- Break down the count by categories if helpful (e.g., \"I see 3 adults and 5 children\")\n- Mention specific locations or groupings to show you've examined the entire image\n- If any people are partially obscured or at the edges, mention this in your reasoning\n- If you initially counted a higher number but then realized some were not people, explain this correction process\n\n## Output Format\nProvide your response with:\n- `reasoning`: A clear explanation of how you counted the people\n- `number_of_people`: An integer representing the total count (capped at 10 if >= 10)",
+      "fields": [
+        {
+          "prefix": "Image:",
+          "description": "${image}"
+        },
+        {
+          "prefix": "Reasoning: Let's think step by step in order to",
+          "description": "${reasoning}"
+        },
+        {
+          "prefix": "Number Of People:",
+          "description": "${number_of_people}"
+        }
+      ]
+    },
+    "lm": null
+  },
+  "metadata": {
+    "dependency_versions": {
+      "python": "3.13",
+      "dspy": "3.0.3",
+      "cloudpickle": "3.1"
+    }
+  }
+}

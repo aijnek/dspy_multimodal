@@ -27,12 +27,12 @@ def test_single_image():
     print("=" * 60)
 
     image = Image.open("images/count/0/zero.jpg")
-    image.thumbnail((1024, 1024), Image.LANCZOS)
+    image.thumbnail((512, 512), Image.LANCZOS)
 
-    lm = dspy.LM('openai/gemma3:4b', api_base='http://localhost:11434/v1', api_key='not_needed')
+    lm = dspy.LM('openai/gemma3:27b', api_base='http://localhost:11434/v1', api_key='not_needed')
     dspy.configure(lm=lm)
 
-    p = dspy.Predict("image: dspy.Image -> number_of_people: int")(image=dspy.Image.from_PIL(image))
+    p = dspy.ChainOfThought("image: dspy.Image -> number_of_people: int")(image=dspy.Image.from_PIL(image))
     print(f"予測された人数: {p.number_of_people}")
     print()
 
@@ -53,18 +53,18 @@ def evaluate_dataset():
     print(f"テストセット: {len(testset)}個")
 
     # LMの設定
-    lm = dspy.LM('openai/gemma3:4b', api_base='http://localhost:11434/v1', api_key='not_needed')
+    lm = dspy.LM('openai/gemma3:27b', api_base='http://localhost:11434/v1', api_key='not_needed')
     dspy.configure(lm=lm)
 
     # プログラムの定義
-    program = dspy.Predict("image: dspy.Image -> number_of_people: int")
+    program = dspy.ChainOfThought("image: dspy.Image -> number_of_people: int")
 
     # Evaluateユーティリティを使用して開発セットで評価
-    print("\n開発セットで評価中...")
+    print("\nテストセットで評価中...")
     print("-" * 60)
 
     evaluator = Evaluate(
-        devset=devset,
+        devset=testset,
         num_threads=1,
         display_progress=True,
         display_table=5
@@ -73,14 +73,22 @@ def evaluate_dataset():
     result = evaluator(program, metric=count_exact_match)
 
     print("-" * 60)
-    print(f"\n精度: {float(result):.1f}%")
+    print(f"\nベース精度: {float(result):.1f}%")
+    print()
+
+    optimized_path = 'optimized.json'
+    optimized_program = program
+    optimized_program.load(path=optimized_path)
+    optimized_result = evaluator(optimized_program, metric=count_exact_match)
+
+    print("-" * 60)
+    print(f"\n最適化後の精度: {float(optimized_result):.1f}%")
     print()
 
 if __name__ == "__main__":
     # 単一画像テスト
-    test_single_image()
+    #test_single_image()
+    #dspy.inspect_history()
 
     # データセット評価
     evaluate_dataset()
-
-    # dspy.inspect_history()
